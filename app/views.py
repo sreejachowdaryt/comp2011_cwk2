@@ -644,96 +644,91 @@ def guest_checkout():
     # Logic to handle checkout for guest users (non-authenticated)
     return render_template('guest_checkout.html', cart=cart)
 
-# Add item to wishlist (Authenticated or Unauthenticated user)
-@app.route('/wishlist/add/<int:product_id>', methods=['POST'])
-def add_to_wishlist(product_id):
-    if current_user.is_authenticated:
-        # Check if the product is already in the wishlist for authenticated users
-        existing_item = WishlistItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-        if existing_item:
-            return jsonify({'message': 'Product is already in your wishlist.'}), 200
-        else:
-            # Add the product to the authenticated user's wishlist
-            wishlist_item = WishlistItem(user_id=current_user.id, product_id=product_id)
-            db.session.add(wishlist_item)
-            db.session.commit()
-            return jsonify({'message': 'Product added to your wishlist!'}), 201
-    else:
-        # Handle unauthenticated users using session storage
-        wishlist = session.get('wishlist', [])
-        if product_id in wishlist:
-            return jsonify({'message': 'Product is already in your wishlist.'}), 200
-        wishlist.append(product_id)
-        session['wishlist'] = wishlist  # Update session
-        return jsonify({'message': 'Product added to your wishlist!'}), 201
+@app.route('/add_to_wishlist', methods=['POST'])
+def add_to_wishlist():
+    if not current_user.is_authenticated:
+        return jsonify({'status': 'not_logged_in'}), 401  # Return status for not logged-in user
 
-# View wishlist items (Authenticated user)
-@app.route('/wishlist', methods=['GET'])
-def view_wishlist():
-    if current_user.is_authenticated:
-        # Fetch wishlist items from the database
-        wishlist_items = WishlistItem.query.filter_by(user_id=current_user.id).all()
-        items = [{
-            'id': item.product.id,
-            'name': item.product.name,
-            'image': url_for('static', filename=item.product.image),
-            'price': item.product.price
-        } for item in wishlist_items]
-    else:
-        # Fetch wishlist from session for unauthenticated users
-        wishlist = session.get('wishlist', [])
-        items = []
+    data = request.get_json()
+    product_id = data.get('product_id')
 
-        for product_id in wishlist:
-            product = Product.query.get(product_id)
-            if product:
-                items.append({
-                    'id': product.id,
-                    'name': product.name,
-                    'image': url_for('static', filename=product.image),
-                    'price': product.price
-                })
+    if not product_id:
+        return jsonify({'status': 'error', 'message': 'No product ID provided.'}), 400
 
-    return render_template('wishlist.html', wishlist_items=items)
+    # Check if the product exists
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'status': 'error', 'message': 'Product not found.'}), 404
 
-# Remove item from wishlist (Authenticated or Unauthenticated user)
-@app.route('/wishlist/remove/<int:product_id>', methods=['POST'])
-@app.route('/wishlist/remove_guest/<int:product_id>', methods=['POST'])
-def remove_from_wishlist(product_id):
-    if current_user.is_authenticated:
-        # For authenticated user: Remove item from database
-        wishlist_item = WishlistItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-        if not wishlist_item:
-            return jsonify({'message': 'Item not found in wishlist.'}), 404
+    # Check if the product is already in the user's wishlist
+    existing_item = WishlistItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if existing_item:
+        return jsonify({'status': 'exists'})
 
-        db.session.delete(wishlist_item)
-        db.session.commit()
-        return jsonify({'message': 'Item removed from wishlist.'}), 200
+    # Add the product to the wishlist
+    new_item = WishlistItem(user_id=current_user.id, product_id=product_id)
+    db.session.add(new_item)
+    db.session.commit()
 
-    else:
-        # For unauthenticated user: Remove item from session
-        wishlist = session.get('wishlist', [])
-        if product_id not in wishlist:
-            return jsonify({'message': 'Item not found in wishlist.'}), 404
+    # Fetch updated wishlist items
+    wishlist_items = WishlistItem.query.filter_by(user_id=current_user.id).all()
+    wishlist_data = [
+        {
+            'id': item.id,
+            'product_name': item.product.name,
+            'product_price': item.product.price,
+            'product_image': url_for('static', filename=item.product.image)
+        }
+        for item in wishlist_items
+    ]
 
-        wishlist.remove(product_id)
-        session['wishlist'] = wishlist  # Update session
-        return jsonify({'message': 'Item removed from wishlist.'}), 200
+    return jsonify({'status': 'success', 'wishlist': wishlist_data})
 
-# View wishlist page (Authenticated or Unauthenticated user)
-@app.route('/wishlist_page', methods=['GET'])
-def wishlist_page():
-    if current_user.is_authenticated:
-        # For authenticated user: Fetch from the database
-        wishlist_items = WishlistItem.query.filter_by(user_id=current_user.id).all()
-        items = [{
-            'id': item.product.id,
-            'name': item.product.name,
-            'image': url_for('static', filename=item.product.image),
-            'price': item.product.price
-        } for item in wishlist_items]
-    else:
-        # For unauthenticated users, the frontend handles displaying from localStorage
-        items = []
+@app.route('/delete_from_wishlist', methods=['POST'])
+@login_required
+def delete_from_wishlist():
+    data = request.get_json()
+    item_id = data.get('item_id')
 
-    return render_template('wishlist.html', wishlist_items=items)
+    # Check if the item exists
+    wishlist_item = WishlistItem.query.filter_by(id=item_id, user_id=current_user.id).first()
+    if not wishlist_item:
+        return jsonify({'status': 'error', 'message': 'Item not found.'}), 404
+
+    # Remove the item from the wishlist
+    db.session.delete(wishlist_item)
+    db.session.commit()
+
+    # Fetch updated wishlist items
+    wishlist_items = WishlistItem.query.filter_by(user_id=current_user.id).all()
+    wishlist_data = [
+        {
+            'id': item.id,
+            'product_name': item.product.name,
+            'product_price': item.product.price,
+            'product_image': url_for('static', filename=item.product.image)
+        }
+        for item in wishlist_items
+    ]
+
+    return jsonify({'status': 'success', 'wishlist': wishlist_data})
+
+@app.route('/get_wishlist', methods=['GET'])
+@login_required
+def get_wishlist():
+    # Fetch the user's wishlist items
+    wishlist_items = WishlistItem.query.filter_by(user_id=current_user.id).all()
+    wishlist_data = [
+        {
+            'id': item.id,
+            'product_name': item.product.name,
+            'product_price': item.product.price,
+            'product_image': url_for('static', filename=item.product.image)
+        }
+        for item in wishlist_items
+    ]
+    return jsonify({'status': 'success', 'wishlist': wishlist_data})
+
+
+
+

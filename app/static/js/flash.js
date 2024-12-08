@@ -51,66 +51,116 @@ $(document).ready(function () {
     });
 });
 
-
-$(document).ready(function() {
-  // Add to Wishlist
-  $('.like-button').on('click', function (e) {
-      e.preventDefault();
-      const productId = $(this).data('product-id');
-
-      // Check if user is logged in
-      if (!window.isAuthenticated) {  // Assume this variable is set from the server-side
-          // Use localStorage or sessionStorage for unauthenticated users
-          let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-          if (!wishlist.includes(productId)) {
-              wishlist.push(productId);
-              localStorage.setItem('wishlist', JSON.stringify(wishlist));
-              alert('Added to your wishlist!');
-          } else {
-              alert('Item already in your wishlist!');
-          }
-      } else {
-          // If logged in, make AJAX request to add to the server-side wishlist
-          $.ajax({
-              url: '/wishlist/add/' + productId,
-              method: 'POST',
-              success: function(response) {
-                  alert(response.message);
-              },
-              error: function() {
-                  alert('There was an error adding the item to the wishlist.');
-              }
-          });
-      }
-  });
-
-  // Handle remove from wishlist action
-  $('#wishlist-items-container').on('click', '.remove-from-wishlist', function () {
-      const productId = $(this).data('product-id');
-
-      if (!window.isAuthenticated) {
-          // Remove from local storage for unauthenticated users
-          let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-          const index = wishlist.indexOf(productId);
-          if (index !== -1) {
-              wishlist.splice(index, 1);
-              localStorage.setItem('wishlist', JSON.stringify(wishlist));
-              alert('Removed from your wishlist!');
-              $(this).closest('.wishlist-item').remove(); // Remove item from the page
-          }
-      } else {
-          // For authenticated users, send AJAX request to remove from backend
-          $.ajax({
-              url: '/wishlist/remove/' + productId,
-              method: 'POST',
-              success: function(response) {
-                  alert(response.message);
-                  $(this).closest('.wishlist-item').remove(); // Remove item from the page
-              },
-              error: function() {
-                  alert('Error removing item from wishlist.');
-              }
-          });
-      }
-  });
+document.addEventListener("DOMContentLoaded", function () {
+    // Attach click event listeners to all like buttons
+    const likeButtons = document.querySelectorAll('.like-button');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = button.getAttribute('data-product-id');
+            addToWishlist(productId);
+        });
+    });
 });
+
+
+// Adding item to wishlist
+function addToWishlist(productId) {
+    fetch('/add_to_wishlist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'not_logged_in') {
+            alert('Please log in to add items to your wishlist.');
+            window.location.href = '/login';  // Redirect to login page
+        } else if (data.status === 'success') {
+            alert('Item added to your wishlist!');
+            updateWishlistModal(data.wishlist); // Update wishlist modal
+            $('#wishlistModal').modal('show'); // Show the modal
+        } else if (data.status === 'exists') {
+            alert('Item is already in your wishlist!');
+            updateWishlistModal(data.wishlist); // Update modal even if item exists
+            $('#wishlistModal').modal('show'); // Show the modal
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+    });
+}
+
+// Load wishlist when the modal is opened
+$('#wishlistModal').on('show.bs.modal', function () {
+    // Check if the user is logged in before fetching wishlist data
+    fetch('/get_wishlist')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'not_logged_in') {
+                alert('You need to log in to view your wishlist.');
+                window.location.href = '/login';  // Redirect to login page
+            } else if (data.status === 'success') {
+                updateWishlistModal(data.wishlist);
+            } else {
+                alert('Failed to load wishlist. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
+});
+
+function updateWishlistModal(wishlist) {
+    const wishlistContainer = document.getElementById('wishlist-items');
+    wishlistContainer.innerHTML = ''; // Clear existing items
+
+    if (wishlist.length === 0) {
+        wishlistContainer.innerHTML = '<p class="text-center">Your wishlist is empty.</p>';
+        return;
+    }
+
+    wishlist.forEach(item => {
+        const wishlistItem = `
+            <div class="wishlist-item d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center">
+                    <img src="${item.product_image}" alt="${item.product_name}" class="wishlist-image" style="width: 50px; height: 50px; margin-right: 10px;">
+                    <div>
+                        <p class="mb-0">${item.product_name}</p>
+                        <p class="mb-0">£${item.product_price}</p>
+                    </div>
+                </div>
+                <!-- Delete button -->
+                <a href="#" class="delete-btn" onclick="removeFromWishlist(${item.id})">
+                    <i class="fa fa-trash text-danger" style="font-size: 1.2rem;"></i>
+                </a>
+            </div>
+        `;
+        wishlistContainer.insertAdjacentHTML('beforeend', wishlistItem);
+    });
+}
+
+// Function to handle wishlist item deletion
+function removeFromWishlist(itemId) {
+    fetch('/delete_from_wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: itemId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Item removed from wishlist.');
+            updateWishlistModal(data.wishlist); // Update modal content
+        } else {
+            alert('Failed to remove item. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+    });
+}
