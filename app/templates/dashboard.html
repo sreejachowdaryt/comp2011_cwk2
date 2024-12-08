@@ -3,13 +3,13 @@
 <div class="container">
     <!-- Welcome Section -->
     <div class="welcome-section">
-        <h2>Welcome, {{ current_user.name }}!</h2>
+        <h2><strong>Welcome, {{ current_user.name }}!</strong></h2>
     </div>
 
     <div class="dashboard-grid">
         <!-- Account Details -->
         <div class="account-details">
-            <h4>Account Details</h4>
+            <h4><strong>Account Details</strong></h4>
             <p>These are your account details</p>
             <p><strong>Username:</strong> {{ current_user.name }}</p>
             <p><strong>Email:</strong> {{ current_user.email }}</p>
@@ -23,18 +23,18 @@
 
         <!-- Change Account Information -->
         <div class="change-account-info">
-            <h4>Change Account Information</h4>
+            <h4><strong>Change Account Information</strong></h4>
             <form action="{{ url_for('update_account') }}" method="POST">
                 <div class="form-group">
-                    <label for="newEmail">New/Existing Email</label>
+                    <label for="newEmail"><strong>New/Existing Email</strong></label>
                     <input type="email" id="newEmail" name="newEmail" class="form-control" value="{{ current_user.email }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="newPassword">New Password</label>
+                    <label for="newPassword"><strong>New Password</strong></label>
                     <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Enter new password">
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm New Password</label>
+                    <label for="confirmPassword"><strong>Confirm New Password</strong></label>
                     <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm new password">
                 </div>
                 <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -44,7 +44,7 @@
 
     <!-- My Orders Section -->
 <div class="my-orders">
-    <h4>My Orders</h4>
+    <h4><strong>My Orders</strong></h4>
     {% if current_user.orders %}
         <div class="orders-grid">
             {% for order in current_user.orders %}
@@ -71,7 +71,7 @@
 
     <!-- Buttons Section -->
     <div class="buttons-section">
-        <a href="{{ url_for('logout') }}" class="btn btn-danger custom-btn">Logout</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-light custom-btn">Logout</a>
         <form method="POST" action="{{ url_for('delete_account') }}" id="deleteAccountForm" style="display: none;">
             <button type="submit" class="btn btn-danger custom-btn">Delete Account</button>
         </form>

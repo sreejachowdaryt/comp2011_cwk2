@@ -100,6 +100,7 @@ def indian_desserts():
 
     return render_template('indian-desserts.html', products=desserts)
 
+# Search bar for seacrhing the items
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query', '').strip().lower()
