@@ -6,6 +6,7 @@ setTimeout(function() {
 }, 3000); // 3000 milliseconds = 3 seconds
 });
 
+// For viewing the password - eye icon 
 function togglePasswordVisibility() {
 var passwordField = document.getElementById('password');
 var eyeIcon = document.getElementById('eyeIcon');
@@ -22,6 +23,41 @@ if (passwordField.type === "password") {
 }
 }
 
+// Cookies settings for the website - Help from section_12 in the module website. 
+window.addEventListener("load", function () {
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "#f4eeee", 
+          "text": "#5c7291"
+        },
+        "button": {
+          "background": "#f4eeee", 
+          "text": "#5c7291" 
+        }
+      },
+      "theme": "classic", 
+      "position": "bottom",
+      "content": {
+        "message": "This website uses cookies to ensure you get the best experience.",
+        "dismiss": "Accept all", 
+        "link": "Learn more",
+        "href": "#" 
+      }
+    });
+  
+    // Automatically remove the cookie banner once "Accept all" button is clicked - help from chatGPT 
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("cc-btn")) {
+        const cookieBanner = document.querySelector(".cc-window");
+        if (cookieBanner) {
+          cookieBanner.style.display = "none"; 
+        }
+      }
+    });
+  });
+
+// Increment and  decremnet of quanity of the items in the cart webpage
 $(document).ready(function () {
     $("button.update-quantity").on("click", function () {
         const itemId = $(this).data("item-id"); // Get the item ID

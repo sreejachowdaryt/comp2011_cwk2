@@ -41,6 +41,7 @@ def cakes():
 @app.route('/cookies')
 def cookies():
     sort_option = request.args.get('sort')
+    query = request.args.get('query', '').strip().lower()
 
     # Start with the base query (including all products regardless of stock)
     cookies_query = Product.query.filter_by(category='Cookie')

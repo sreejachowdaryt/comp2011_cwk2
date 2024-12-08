@@ -331,6 +331,20 @@ footer a:hover {
   color: #0b5394; 
 }
 
+/* Out of Stock Label */
+.out-of-stock-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255, 0, 0, 0.8); 
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 3px;
+  z-index: 10;
+}
+
 /* Cart button styling */
 .btn-primary {
   background-color: #ff6600;
@@ -376,6 +390,34 @@ footer a:hover {
   font-size: 1rem;  
   color: #333;      
   font-weight: bold; 
+}
+
+/* Remove the default styling of the select dropdown */
+.sort-select {
+  appearance: none;        
+  border: 1px solid #ccc;  
+  background-color: #fff;   
+  padding: 8px 12px;         
+  font-size: 14px;          
+  cursor: pointer;          
+}
+
+.sort-select::after {
+  content: '▼';  
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
+.sort-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sort-label {
+  margin-right: 8px;
 }
 
 /* Styling for the Sort dropdown */
@@ -605,6 +647,81 @@ h4 {
   }
 }
 
+/* Checkout page styling */
+.checkout-page .container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: medium;
+}
+
+.checkout-page h1, .checkout-page h2 {
+  text-align: center;
+}
+
+.checkout-page .order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.checkout-page .order-table th, .checkout-page .order-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.checkout-page .order-table .product-img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.checkout-page .order-table .total-label {
+  text-align: right;
+  font-weight: bold;
+}
+
+.checkout-page .order-table .total-value {
+  font-weight: bold;
+}
+
+.checkout-page .checkout-form {
+  margin-top: 20px;
+}
+
+.checkout-page .form-group {
+  margin-bottom: 15px;
+}
+
+.checkout-page .form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.checkout-page .form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.checkout-page .btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.checkout-page .btn:hover {
+  background-color: #0056b3;
+}
+
 /* Sidebar Styling */
 .sidebar {
   width: 25%;
@@ -717,40 +834,42 @@ h4 {
 
 /* Delete button cart webpage */
 .delete-btn {
-  display: flex;               /* Enable flexbox for centering */
-  justify-content: center;     /* Horizontally center the icon */
-  align-items: center;         /* Vertically center the icon */
-  border: none;                /* No border */
-  color: #f44336;              /* Red icon for delete */
-  font-size: 20px;             /* Icon size */
-  cursor: pointer;            /* Pointer cursor */
-  transition: color 0.3s ease; /* Smooth color transition */
-  width: 100%;                 /* Ensure it takes up full width of the table cell */
-  height: 100%;                /* Ensure it takes up full height of the table cell */
+  display: flex;              
+  justify-content: center;     
+  align-items: center;         
+  border: none;               
+  color: #f44336;             
+  font-size: 20px;             
+  cursor: pointer;            
+  transition: color 0.3s ease; 
+  width: 100%;                 
+  height: 100%;               
 }
 
 .delete-btn:hover {
-  color: #2196F3; /* Blue color on hover */
+  color: #2196F3; 
 }
 
 .delete-btn:focus {
-  outline: none;  /* Remove focus outline */
+  outline: none; 
 }
 
 .custom-add-to-cart-btn {
-  border: none;           /* Remove any border */
-  outline: none;          /* Remove outline on focus */
-  box-shadow: none;       /* Remove any shadow around the button */
-  background-color: #007bff;  /* Your custom background */
-  color: white;               /* Set text color */
-  padding: 10px 20px;         /* Add some padding */
-  cursor: pointer;           /* Make the button appear clickable */
+  border: none;          
+  outline: none;          
+  box-shadow: none;       
+  background-color: #007bff; 
+  color: white;               
+  padding: 10px 20px;        
+  cursor: pointer;           
 }
 
-/* Base styles for the table */
+/* Cart table styling */
 .table {
   width: 100%;
   border-collapse: collapse;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: large;
 }
 
 /* Makes the table horizontally scrollable */
@@ -761,9 +880,8 @@ h4 {
 
 /* Adjust table layout for smaller screens */
 @media (max-width: 768px) {
-  /* Hide table headings for smaller screens */
   .table thead {
-    display: none !important; /* Force hide table headers */
+    display: none !important; 
   }
 
   /* Style for mobile card layout */
@@ -780,14 +898,14 @@ h4 {
   .table tbody td {
     display: block;
     text-align: left;
-    padding-left: 50%; /* Position the label on the left */
+    padding-left: 50%; 
     position: relative;
-    border-bottom: 1px solid #f4f4f4; /* Add a separator between rows */
+    border-bottom: 1px solid #f4f4f4; 
   }
 
   /* Label style for each data field */
   .table tbody td::before {
-    content: attr(data-label); /* Use the 'data-label' attribute to show label */
+    content: attr(data-label); 
     position: absolute;
     left: 10px;
     font-weight: bold;
@@ -817,152 +935,54 @@ h4 {
 
 /* Common styles for both buttons (Continue Shopping and Proceed to Checkout) */
 .custom-btn {
-  padding: 12px 30px; /* Add padding for larger buttons */
-  font-size: 16px;    /* Set font size */
-  border-radius: 5px; /* Rounded corners */
-  text-decoration: none; /* Remove underline */
-  margin-right: 10px;  /* Space between buttons */
-  display: inline-block; /* Make sure buttons align horizontally */
+  padding: 12px 30px; 
+  font-size: 16px;   
+  border-radius: 5px; 
+  text-decoration: none; 
+  margin-right: 10px;  
+  display: inline-block; 
   width: auto;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
-  margin-bottom: 20px; /* Add margin-bottom for spacing below buttons */
+  transition: background-color 0.3s ease, transform 0.3s ease; 
+  margin-bottom: 20px; 
 }
 
 .custom-btn:hover {
-  transform: scale(1.05); /* Slightly enlarge on hover */
+  transform: scale(1.05);
 }
 
 .custom-btn:focus {
-  outline: none; /* Remove focus outline */
+  outline: none; 
 }
 
 /* Styling for both Continue Shopping and Proceed to Checkout buttons */
 .custom-btn {
-  background-color: #007bff; /* Blue background for both buttons */
-  color: #fff; /* White text */
-  border: 1px solid #007bff; /* Blue border */
+  background-color: #007bff; 
+  color: #fff; 
+  border: 1px solid #007bff; 
 }
 
+/* cookies styling */
 .custom-btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-  color: white; /* Keep text white on hover */
+  background-color: #f4eeee;
+  color: white; 
 }
 
-/* Out of Stock Label */
-.out-of-stock-label {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: rgba(255, 0, 0, 0.8); /* Red with opacity */
-  color: white;
-  padding: 5px 10px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 3px;
-  z-index: 10;
+.cc-window {
+  position: fixed !important; 
+  bottom: 0; 
+  left: 0;
+  right: 0;
+  z-index: 9999; 
+  margin: 0;
+  padding: 10px 15px; 
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); 
 }
 
-/* Styles scoped to checkout-page */
-.checkout-page .container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
+.cc-window.cc-banner {
+  width: 100%; 
+  text-align: center; 
 }
 
-.checkout-page h1, .checkout-page h2 {
-  text-align: center;
-}
-
-.checkout-page .order-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.checkout-page .order-table th, .checkout-page .order-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.checkout-page .order-table .product-img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-}
-
-.checkout-page .order-table .total-label {
-  text-align: right;
-  font-weight: bold;
-}
-
-.checkout-page .order-table .total-value {
-  font-weight: bold;
-}
-
-.checkout-page .checkout-form {
-  margin-top: 20px;
-}
-
-.checkout-page .form-group {
-  margin-bottom: 15px;
-}
-
-.checkout-page .form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.checkout-page .form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.checkout-page .btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.checkout-page .btn:hover {
-  background-color: #0056b3;
-}
-
-
-/* Remove the default styling of the select dropdown */
-.sort-select {
-  appearance: none;         /* Removes default styling in modern browsers */
-  border: 1px solid #ccc;   /* Add custom border */
-  background-color: #fff;   /* Custom background color */
-  padding: 8px 12px;         /* Custom padding */
-  font-size: 14px;           /* Custom font size */
-  cursor: pointer;          /* Add pointer cursor on hover */
-}
-
-/* Optional: Add a custom arrow to the dropdown */
-.sort-select::after {
-  content: '▼';  /* Custom arrow */
-  position: absolute;
-  right: 10px;
-  pointer-events: none;
-}
-
-/* Add padding to the container */
-.sort-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-/* Add space between label and select */
-.sort-label {
-  margin-right: 8px;
+.cc-compliance .cc-btn {
+  margin: 0 10px; 
 }
