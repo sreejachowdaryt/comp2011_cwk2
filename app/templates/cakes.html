@@ -48,7 +48,15 @@
           <h5 class="card-title"><strong>{{ product.name }}</strong></h5>
           <p class="card-text">{{ product.description }}</p>
           <p class="text-primary font-weight-bold">Price: £{{ product.price }}</p>
-          <p>Stock: {% if product.stock > 0 %} {{ product.stock }} available {% else %} Out of stock {% endif %}</p>
+          <p>Stock: 
+            {% if product.stock > 10 %}
+              <span class="text-success">{{ product.stock }} available</span>
+            {% elif product.stock > 0 %}
+              <span class="text-warning">Only {{ product.stock }} left!</span>
+            {% else %}
+              <span class="text-danger">Out of stock</span>
+            {% endif %}
+          </p>
           <div class="d-flex justify-content-between">
             {% if product.stock > 0 %}
             <!-- Help from chatgpt on how to remove box shawdow around add to cart which I was facing  -->

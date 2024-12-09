@@ -115,26 +115,25 @@ def indian_desserts():
 
     return render_template('indian-desserts.html', products=desserts, query=query)
 
-# Search bar for seacrhing the items
+# Search Page for Items
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query', '').strip().lower()
 
     if query:
-        # Check if the query matches any of your product categories
-        if 'cake' in query:
-            return redirect(url_for('cakes', query=query))
-        elif 'cookie' in query:
-            return redirect(url_for('cookies', query=query))
-        elif 'chocolate' in query:
-            return redirect(url_for('chocolates', query=query))
-        elif 'dessert' in query or 'indian' in query:
-            return redirect(url_for('indian_desserts', query=query))
-        else:
-            # If no match, redirect to a default page or show all products
-            flash("No results found for your search.", "danger")
-            return redirect(url_for('home'))  # Replace with a page showing all products or a default page
-    return redirect(request.referrer or url_for('home'))  # Redirect to home page if no query
+        # Fetch all products matching the query across all categories
+        search_results = Product.query.filter(Product.name.ilike(f'%{query}%')).all()
+
+        if search_results:
+            return render_template('search-items.html', products=search_results, query=query)
+
+        # If no products are found, show a flash message and redirect
+        flash(f"No results found for '{query}'. Please try again.", "warning")
+        return redirect(url_for('home'))
+
+    # Redirect to home if no query provided
+    flash("Please enter a search term.", "info")
+    return redirect(url_for('home'))
 
 # Updating stock on purchase
 def process_order(cart_items):
