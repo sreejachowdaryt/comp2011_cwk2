@@ -43,8 +43,12 @@ def cookies():
     sort_option = request.args.get('sort')
     query = request.args.get('query', '').strip().lower()
 
-    # Start with the base query (including all products regardless of stock)
+    # Start with the base query filtering by category
     cookies_query = Product.query.filter_by(category='Cookie')
+
+    # Apply search filter based on the query
+    if query:
+        cookies_query = cookies_query.filter(Product.name.ilike(f'%{query}%'))
 
     # Apply sorting based on user selection
     if sort_option == 'lowest_to_highest':
@@ -57,15 +61,20 @@ def cookies():
     # Fetch the results after applying all filters and sorting
     cookies = cookies_query.all()
 
-    return render_template('cookies.html', products=cookies)
+    return render_template('cookies.html', products=cookies, query=query)
 
 # Chocolates Page
 @app.route('/chocolates')
 def chocolates():
     sort_option = request.args.get('sort')
+    query = request.args.get('query', '').strip().lower()
 
-    # Start with the base query (including all products regardless of stock)
+    # Start with the base query filtering by category
     chocolates_query = Product.query.filter_by(category='Chocolate')
+
+    # Apply search filter based on the query
+    if query:
+        chocolates_query = chocolates_query.filter(Product.name.ilike(f'%{query}%'))
 
     # Apply sorting based on user selection
     if sort_option == 'lowest_to_highest':
@@ -78,15 +87,20 @@ def chocolates():
     # Fetch the results after applying all filters and sorting
     chocolates = chocolates_query.all()
 
-    return render_template('chocolates.html', products=chocolates)
+    return render_template('chocolates.html', products=chocolates, query=query)
 
 # Indian Desserts Page
 @app.route('/indian-desserts')
 def indian_desserts():
     sort_option = request.args.get('sort')
+    query = request.args.get('query', '').strip().lower()
 
-    # Start with the base query (including all products regardless of stock)
+    # Start with the base query filtering by category
     desserts_query = Product.query.filter_by(category='Dessert')
+
+    # Apply search filter based on the query
+    if query:
+        desserts_query = desserts_query.filter(Product.name.ilike(f'%{query}%'))
 
     # Apply sorting based on user selection
     if sort_option == 'lowest_to_highest':
@@ -99,7 +113,7 @@ def indian_desserts():
     # Fetch the results after applying all filters and sorting
     desserts = desserts_query.all()
 
-    return render_template('indian-desserts.html', products=desserts)
+    return render_template('indian-desserts.html', products=desserts, query=query)
 
 # Search bar for seacrhing the items
 @app.route('/search', methods=['GET'])
@@ -114,7 +128,7 @@ def search():
             return redirect(url_for('cookies', query=query))
         elif 'chocolate' in query:
             return redirect(url_for('chocolates', query=query))
-        elif 'dessert' in query:
+        elif 'dessert' in query or 'indian' in query:
             return redirect(url_for('indian_desserts', query=query))
         else:
             # If no match, redirect to a default page or show all products

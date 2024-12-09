@@ -3,6 +3,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
   <h2><strong>Chocolates</strong></h2>
+  <!-- Display search query if available -->
+  {% if query %}
+    <p>Showing results for: <strong>{{ query }}</strong></p>
+  {% endif %}
+  
   <!-- Sort Dropdown -->
   <div class="sort-container">
     <form method="GET" action="{{ url_for('chocolates') }}" class="form-inline">

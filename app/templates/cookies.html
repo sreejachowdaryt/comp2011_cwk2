@@ -3,6 +3,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
   <h2><strong>Cookies</strong></h2>
+  <!-- Display search query if available -->
+  {% if query %}
+    <p>Showing results for: <strong>{{ query }}</strong></p>
+  {% endif %}
+  
   <!-- Sort Dropdown -->
   <div class="sort-container">
     <form method="GET" action="{{ url_for('cookies') }}" class="form-inline">
@@ -30,10 +35,14 @@
           <div class="out-of-stock-label">Sold Out</div>
           {% endif %}
           
-          <!-- Like Button -->
-          <a href="#" class="like-button position-absolute" style="top: 10px; right: 10px;" data-product-id="{{ product.id }}">
-            <i class="fas fa-heart"></i>
-          </a>
+         <!-- Like Button -->
+         <a href="javascript:void(0);" 
+         class="like-button position-absolute" 
+         style="top: 10px; right: 10px;" 
+         data-product-id="{{ product.id }}" 
+         onclick="addToWishlist(this)">
+         <i class="fas fa-heart"></i>
+      </a>
         </div>
         <div class="card-body">
           <h5 class="card-title"><strong>{{ product.name }}</strong></h5>
