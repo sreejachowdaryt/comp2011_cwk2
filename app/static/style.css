@@ -209,6 +209,7 @@ footer a {
   text-decoration: none;
   padding: 5px;
   padding-top: 20px;
+  font-size: medium;
 }
 
 footer a:hover {
@@ -223,6 +224,7 @@ footer a:hover {
 .information{
   font-family: 'Times New Roman', Times, serif;
   color: #ff6600;
+  font-size: medium;
 }
 
 .inter-info{

@@ -50,11 +50,9 @@
           <p class="text-primary font-weight-bold">Price: £{{ product.price }}</p>
           <p>Stock: 
             {% if product.stock > 10 %}
-              <span class="text-success">{{ product.stock }} available</span>
-            {% elif product.stock > 0 %}
-              <span class="text-warning">Only {{ product.stock }} left!</span>
+              <span class="text-success"><strong>{{ product.stock }} available</strong></span>
             {% else %}
-              <span class="text-danger">Out of stock</span>
+              <span class="text-danger"><strong>Out of stock</strong></span>
             {% endif %}
           </p>
           <div class="d-flex justify-content-between">
