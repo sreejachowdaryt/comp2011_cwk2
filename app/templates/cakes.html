@@ -51,6 +51,8 @@
           <p>Stock: 
             {% if product.stock > 10 %}
               <span class="text-success"><strong>{{ product.stock }} available</strong></span>
+            {% elif product.stock > 0 %}
+              <span class="text-success"><strong>Only {{ product.stock }} left!<strong></span>
             {% else %}
               <span class="text-danger"><strong>Out of stock</strong></span>
             {% endif %}
