@@ -15,9 +15,19 @@
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="card-text">Category: {{ product.category }}</p>
                             <p class="text-primary font-weight-bold">Price: £{{ product.price }}</p>
-                            <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+                            <div class="d-flex justify-content-between">
+                                {% if product.stock > 0 %}
+                                <!-- Help from chatgpt on how to remove box shawdow around add to cart which I was facing  -->
+                                <form method="POST" action="{{ url_for('add_to_cart') }}" id="addToCartForm{{ product.id }}" style="display: none;" onsubmit="location.reload();">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
                                 <button type="submit" class="btn btn-primary">Add to Cart</button>
-                            </form>
+                                </form>
+                                <!-- Button to Trigger the Form Submission -->
+                                <a href="javascript:void(0);" onclick="document.getElementById('addToCartForm{{ product.id }}').submit();" class="btn btn-primary custom-btn">Add to Cart</a>
+                              {% else %}
+                              <button class="btn btn-primary" disabled>Add to Cart</button>
+                                {% endif %}
+                              </div>
                         </div>
                     </div>
                 </div>
