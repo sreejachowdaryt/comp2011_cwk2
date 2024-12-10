@@ -6,87 +6,83 @@ setTimeout(function() {
 }, 3000); // 3000 milliseconds = 3 seconds
 });
 
-// For viewing the password - eye icon 
-function togglePasswordVisibility() {
-var passwordField = document.getElementById('password');
-var eyeIcon = document.getElementById('eyeIcon');
-
-// Toggle the input type between password and text
-if (passwordField.type === "password") {
-  passwordField.type = "text";
-  eyeIcon.classList.remove('fa-eye');
-  eyeIcon.classList.add('fa-eye-slash');
-} else {
-  passwordField.type = "password";
-  eyeIcon.classList.remove('fa-eye-slash');
-  eyeIcon.classList.add('fa-eye');
-}
-}
-
 // Cookies settings for the website - Help from section_12 in the module website. 
 window.addEventListener("load", function () {
     window.cookieconsent.initialise({
-      "palette": {
+        "palette": {
         "popup": {
-          "background": "#f4eeee", 
-          "text": "#5c7291"
+            "background": "#f4eeee", 
+            "text": "#5c7291"
         },
         "button": {
-          "background": "#f4eeee", 
-          "text": "#5c7291" 
+            "background": "#f4eeee", 
+            "text": "#5c7291" 
         }
-      },
-      "theme": "classic", 
-      "position": "bottom",
-      "content": {
+        },
+        "theme": "classic", 
+        "position": "bottom",
+        "content": {
         "message": "This website uses cookies to ensure you get the best experience.",
         "dismiss": "Accept all", 
         "link": "Learn more",
         "href": "#" 
-      }
+        }
     });
-  
+    
     // Automatically remove the cookie banner once "Accept all" button is clicked - help from chatGPT 
     document.addEventListener("click", function (e) {
-      if (e.target.classList.contains("cc-btn")) {
+        if (e.target.classList.contains("cc-btn")) {
         const cookieBanner = document.querySelector(".cc-window");
         if (cookieBanner) {
-          cookieBanner.style.display = "none"; 
+            cookieBanner.style.display = "none"; 
         }
-      }
+        }
     });
-  });
-
-// Increment and  decremnet of quanity of the items in the cart webpage
-$(document).ready(function () {
-    $("button.update-quantity").on("click", function () {
-        const itemId = $(this).data("item-id"); // Get the item ID
-        const change = parseInt($(this).data("change")); // +1 for increment, -1 for decrement
-
-        // Send AJAX request to update quantity
-        $.ajax({
-            url: "/update-cart",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ itemId: itemId, change: change }),
-            success: function (response) {
-                if (response.status === "success") {
-                    // Update the quantity and totals dynamically
-                    $(`#quantity-${itemId}`).text(response.newQuantity);
-                    $(`#total-${itemId}`).text(`£${response.itemTotal.toFixed(2)}`);
-                    $("#cart-total").text(`Total: £${response.cartTotal.toFixed(2)}`);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                const response = JSON.parse(xhr.responseText);
-                alert(response.message);
-            }
-        });
     });
-});
 
+// Incrementing and decrmenting items already present in the cart
+function updateCart(itemId, change) {
+fetch('/update-cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ itemId, change })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.status === 'success') {
+        // Get the row that contains the item
+        const row = document.querySelector(`#item-row-${itemId}`);
+        
+        // Update the quantity in the cart table
+        const quantityCell = row.querySelector('.quantity-cell');
+        const subtotalCell = row.querySelector(`#total-${itemId}`);
+        
+        // Update the quantity between the `-` and `+` buttons
+        quantityCell.textContent = data.newQuantity;
+
+        // Update the subtotal for the item
+        subtotalCell.textContent = `£${data.itemTotal.toFixed(2)}`;
+
+        // Update the total price displayed in the cart
+        document.querySelector('#total-price').textContent = `Total Price: £${data.cartTotal.toFixed(2)}`;
+
+        // Update the cart symbol with the total quantity
+        const cartQuantity = document.querySelector('.cart-quantity');
+        cartQuantity.textContent = data.cartQuantity;
+
+            // If quantity is 0, remove the item row from the cart
+            if (data.newQuantity === 0) {
+            row.remove();
+        }
+
+    } else {
+        alert(data.message); // Show error message if any
+    }
+})
+.catch(error => console.error('Error:', error));
+}
+
+// Adding items to wishlist
 document.addEventListener("DOMContentLoaded", function () {
     // Attach click event listeners to all like buttons
     const likeButtons = document.querySelectorAll('.like-button');
@@ -97,7 +93,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-
 
 // Adding item to wishlist
 function addToWishlist(productId) {
